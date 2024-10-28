@@ -1,7 +1,7 @@
 pipeline{
        agent none
        triggers {
-           upstream 'pipeline_agents, '
+           upstream 'pipeline_agents'
        }
        stages {
            stage('stage-1') {
