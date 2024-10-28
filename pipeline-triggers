@@ -1,15 +1,13 @@
 pipeline{
        agent none
        triggers {
-           cron '2 * * * *'
-           pollSCM '5 * * * *'
            upstream 'pipeline_agents, '
        }
        stages {
            stage('stage-1') {
                  agent { label 'master' }
                  steps {
-                       sh 'mkdir java.txt'
+                       sh 'mkdir java2.txt'
                  }
           }
 
