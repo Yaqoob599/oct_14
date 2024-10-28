@@ -4,7 +4,8 @@ pipeline{
            stage('stage-1') {
                  agent { label 'master' }
                  steps {
-                       sh 'mkdir java.txt'
+                       sh 'mkdir test_java.txt'
+                       echo " created directory "
                  }
           }
 
