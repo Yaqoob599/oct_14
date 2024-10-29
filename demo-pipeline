@@ -4,7 +4,7 @@ pipeline {
        stages {
               stage('checkout') {
                     steps {
-                         git branch: 'main', url: 'https://github.com/saikiran-private/java-code-sample-with-unit-test-cases'
+                         git branch: 'main', url: 'https://github.com/boxfuse/boxfuse-sample-java-war-hello.git'
                     }
                }
 
@@ -20,11 +20,7 @@ pipeline {
                      }
                }
 
-               stage('push') {
-                    steps {
-                          echo 'pushing artifact to artifactory'
-                     }
-               }
+             
 
        }
 
