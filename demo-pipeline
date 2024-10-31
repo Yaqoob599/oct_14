@@ -11,7 +11,7 @@ pipeline {
                stage('test') {
                      steps {
                          echo 'running unit test and integration test'
-                         echo 'testing for webhook trigger'
+                         echo 'testing for webhook trigger for multibranch'
                      }
                }
 
