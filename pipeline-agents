@@ -1,0 +1,19 @@
+pipeline{
+       agent none
+       stages {
+           stage('stage-1') {
+                 agent { label 'master' }
+                 steps {
+                       sh 'mkdir test_java.txt'
+                       echo " created directory "
+                 }
+          }
+
+          stage('stage-2') {
+                agent { label 'java'}
+                steps {
+                      sh 'touch sample.txt'
+                }
+          }
+       }
+}

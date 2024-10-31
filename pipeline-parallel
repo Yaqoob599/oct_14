@@ -1,0 +1,31 @@
+pipeline{
+       agent none
+       stages {
+           stage('stage-1') {
+                 agent { label 'master' }
+                 steps {
+                       sh 'touch parallel.txt'
+                 }
+          }
+
+          stage('build-stage') {
+                parallel {
+                    stage ('stage-1 build') {
+                       agent { label 'java'}
+                       steps {
+                             echo 'Building in stage-1'
+                             sh 'sleep 30'
+                       }
+                    }
+                    stage ('stage-2 build') {
+                       agent { label 'master'}
+                       steps {
+                             echo 'Building in stage-2'
+                             sh 'sleep 30'
+                       }
+                    }      
+ 
+                }
+           }
+       }
+}
