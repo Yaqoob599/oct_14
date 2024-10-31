@@ -1,24 +1,29 @@
 pipeline {
-      agent any
-      stages{
-          stage ('build'){
-                   steps {
-                       echo "building the project"
-                   }
-          }
-      }
+    agent any
+    stages {
+        stage('build') {
+            steps {
+                echo "building the project"
+            }
+        }
+    }
+    
+    post {
+        success {
+            emailext(
+                body: 'Build success',
+                subject: "${env.JOB_NAME} - Build #${env.BUILD_NUMBER} - ${env.BUILD_URL} - SUCCESS",
+                to: 'yaqoobali599@gmail.com'
+            )
+        }
+        failure {
+            emailext(
+                body: 'Build failure',
+                subject: "${env.JOB_NAME} - Build #${env.BUILD_NUMBER} - ${env.BUILD_URL} - FAILURE",
+                to: 'yaqoobali599@gmail.com'
+            )
+        }
+    }
 }
 
-      post{
-         success{
-             emailext(
-                     body: 'build success', subject: '$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_URL - $BUILD_STATUS:', to: 'yaqoobali599@gmail.com'
-             )
-         }
-         failure{
-             emailext( 
-                     body: 'build failure', subject: '$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_URL - $BUILD_STATUS:', to: 'yaqoobali599@gmail.com'
-             )
-         }
-      }
 
