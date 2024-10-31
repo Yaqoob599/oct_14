@@ -6,6 +6,7 @@ pipeline{
                  steps {
                        sh 'mkdir test_java.txt'
                        echo " created directory "
+                       echo "check for webhook trigger"
                  }
           }
 
