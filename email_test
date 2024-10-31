@@ -7,7 +7,7 @@ pipeline {
                    }
           }
       }
-      }
+}
       post{
          success{
              emailext body: 'build success', subject: '$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_URL - $BUILD_STATUS:', to: 'yaqoobali599@gmail.com'
@@ -16,4 +16,4 @@ pipeline {
              emailext body: 'build failure', subject: '$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_URL - $BUILD_STATUS:', to: 'yaqoobali599@gmail.com'
          }
       }
-}
+
