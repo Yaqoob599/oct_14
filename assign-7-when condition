@@ -1,8 +1,8 @@
 pipeline {
      agent any
     triggers {
-        cron('* * * * *')
-        pollSCM('* * * * *')
+        cron('0 0 * * *')
+        pollSCM('0 0 * * *')
     }
 
     parameters {
@@ -47,7 +47,7 @@ pipeline {
             agent { label 'java' }
             when {
                 anyOf {
-                    branch 'master'
+                    branch 'main'
                     branch 'Dev'
                 }
             }
