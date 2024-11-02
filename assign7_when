@@ -1,5 +1,6 @@
 pipeline {
-     agent any
+    agent any
+
     triggers {
         cron('0 0 * * *')
         pollSCM('0 0 * * *')
@@ -10,7 +11,7 @@ pipeline {
         choice(name: 'ENV', choices: ['DEV', 'QA', 'PROD'], description: 'Choose among environments')
         booleanParam(name: 'ENABLE_NOTIFICATIONS', defaultValue: true, description: 'Enable Notifications?')
     }
-    
+
     environment {
         ENV_NAME = "${params.ENV}"
         NOTIFICATION_ENABLED = "${params.ENABLE_NOTIFICATIONS}"
@@ -19,7 +20,7 @@ pipeline {
         SECRET_TXT = credentials('GITHUB_TOKEN')
         USER_CREDENTIALS = credentials('JENKINS_USERNEW')
     }
-    
+
     stages {
         
         stage('Stage 1 - Build') {
@@ -46,13 +47,16 @@ pipeline {
 
         stage('Stage 3 - Deploy') {
             agent { label 'java' }
-               when {
-                expression {
-                         currentBuild.result == null || currentBuild.result == 'SUCCESS'
-                         return env.GIT_BRANCH == 'main' || env.GIT_BRANCH == 'dev1'
-                } // Only runs if the previous stages succeeded
-              }
-         steps {
+            when {
+                allOf {
+                    expression { currentBuild.result == null || currentBuild.result == 'SUCCESS' }
+                    anyOf {
+                        branch 'main'
+                        branch 'dev1'
+                    }
+                }
+            }
+            steps {
                 echo "Deploying ${JOB_TITLE} to ${ENV_NAME} environment."
                 echo "Using credentials with username: ${env.USER_CREDENTIALS_USR}"
             }
@@ -60,18 +64,16 @@ pipeline {
 
         stage('Stage 4 - Notify') {
             agent { label 'java' }
-                when {
-                expression {
-                         currentBuild.result == null || currentBuild.result == 'SUCCESS'
-                } // Only runs if the previous stages succeeded
-              }
+            when {
+                expression { currentBuild.result == null || currentBuild.result == 'SUCCESS' }
+            }
             steps {
                 echo "Sending deployment notifications for ${JOB_TITLE}."
             }
         }
     }
 
-   post {
+    post {
         success {
             emailext(
                 body: "The build succeeded!\nJob URL: ${env.BUILD_URL}",
@@ -82,7 +84,7 @@ pipeline {
         failure {
             emailext(
                 body: "The build failed!\nJob URL: ${env.BUILD_URL}",
-                subject: "${env.JOB_NAME} - Build #${env.BUILD_NUMBER} - SUCCESS",
+                subject: "${env.JOB_NAME} - Build #${env.BUILD_NUMBER} - FAILURE",
                 to: 'yaqoobali599@gmail.com'
             )
         }
