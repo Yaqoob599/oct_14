@@ -47,10 +47,9 @@ pipeline {
         stage('Stage 3 - Deploy') {
             agent { label 'java' }
             when {
-                anyOf {
-                    branch 'main'
-                    branch 'dev1'
-                }
+                 expression {
+                         return env.GIT_BRANCH == 'main' || env.GIT_BRANCH == 'origin/main' || env.GIT_BRANCH == 'dev1'
+                 }
             }
             steps {
                 echo "Deploying ${JOB_TITLE} to ${ENV_NAME} environment."
