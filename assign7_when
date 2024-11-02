@@ -1,0 +1,89 @@
+pipeline {
+     agent any
+    triggers {
+        cron('0 0 * * *')
+        pollSCM('0 0 * * *')
+    }
+
+    parameters {
+        string(name: 'user_id', defaultValue: 'jenkins-user', description: 'Enter your ID before running the job')
+        choice(name: 'ENV', choices: ['DEV', 'QA', 'PROD'], description: 'Choose among environments')
+        booleanParam(name: 'ENABLE_NOTIFICATIONS', defaultValue: true, description: 'Enable Notifications?')
+    }
+    
+    environment {
+        ENV_NAME = "${params.ENV}"
+        NOTIFICATION_ENABLED = "${params.ENABLE_NOTIFICATIONS}"
+        JOB_TITLE = "${params.user_id}"
+        
+        SECRET_TXT = credentials('GITHUB_TOKEN')
+        USER_CREDENTIALS = credentials('JENKINS_USERNEW')
+    }
+    
+    stages {
+        
+        stage('Stage 1 - Build') {
+            agent { label 'master' }
+             when {
+                  allOf {
+                       branch 'main'
+                       branch 'dev1'
+                       branch 'origin/main'
+                  }
+             }
+            steps {
+                echo "Building the project for user: ${JOB_TITLE}"
+                echo "Deployment Environment: ${ENV_NAME}"
+            }
+        }
+
+        stage('Stage 2 - Test') {
+            agent { label 'master' }
+            steps {
+                script {
+                    if (NOTIFICATION_ENABLED) {
+                        echo "Notifications are enabled."
+                    }
+                    echo "Running tests for ${JOB_TITLE}"
+                    echo "Using Secret Token: ${env.SECRET_TXT}"
+                    echo "Current branch: ${env.GIT_BRANCH}"
+                }
+            }
+        }
+
+        stage('Stage 3 - Deploy') {
+            agent { label 'java' }
+
+         steps {
+                echo "Deploying ${JOB_TITLE} to ${ENV_NAME} environment."
+                echo "Using credentials with username: ${env.USER_CREDENTIALS_USR}"
+            }
+        }
+
+        stage('Stage 4 - Notify') {
+            agent { label 'java' }
+            steps {
+                echo "Sending deployment notifications for ${JOB_TITLE}."
+            }
+        }
+    }
+
+    post {
+        success {
+            emailext(
+                to: 'yaqoobali599@gmail.com',
+                subject: "${env.JOB_NAME} - Build #${env.BUILD_NUMBER} - SUCCESS",
+                body: "The build succeeded!\nJob URL: ${env.BUILD_URL}",
+                attachLog: true
+            )
+        }
+        failure {
+            emailext(
+                to: 'yaqoobali599@gmail.com',
+                subject: "${env.JOB_NAME} - Build #${env.BUILD_NUMBER} - FAILURE",
+                body: "The build failed.\nJob URL: ${env.BUILD_URL}",
+                attachLog: true
+            )
+        }
+    }
+}
