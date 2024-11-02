@@ -1,5 +1,5 @@
 pipeline {
-       agent any
+     agent any
     triggers {
         cron('0 0 * * *')
         pollSCM('0 0 * * *')
@@ -47,11 +47,12 @@ pipeline {
         stage('Stage 3 - Deploy') {
             agent { label 'java' }
             when {
-                anyOf {
-                    branch 'main'
-                    branch 'dev1'
-                }
-            }
+        allOf {
+            branch 'main'
+            branch 'dev1'
+            branch 'origin/main'
+        }
+    }
             steps {
                 echo "Deploying ${JOB_TITLE} to ${ENV_NAME} environment."
                 echo "Using credentials with username: ${env.USER_CREDENTIALS_USR}"
