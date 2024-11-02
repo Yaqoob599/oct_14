@@ -48,8 +48,8 @@ pipeline {
             agent { label 'java' }
             when {
                 anyOf {
-                    branch 'origin/main'
-                    branch 'origin/dev1'
+                    branch 'main'
+                    branch 'dev1'
                 }
             }
             steps {
