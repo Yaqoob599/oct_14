@@ -45,12 +45,6 @@ pipeline {
 
         stage('Stage 3 - Deploy') {
             agent { label 'java' }
-            when {
-                anyOf {
-                    branch 'main'
-                    branch 'Dev'
-                }
-            }
             steps {
                 echo "Deploying ${JOB_TITLE} to ${ENV_NAME} environment."
                 echo "Using credentials with username: ${env.USER_CREDENTIALS_USR}"
