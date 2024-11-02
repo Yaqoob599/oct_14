@@ -39,6 +39,7 @@ pipeline {
                     }
                     echo "Running tests for ${JOB_TITLE}"
                     echo "Using Secret Token: ${env.SECRET_TXT}"
+                    echo "Current branch: ${env.GIT_BRANCH}"
                 }
             }
         }
@@ -48,7 +49,7 @@ pipeline {
             when {
                 anyOf {
                     branch 'main'
-                    branch 'Dev'
+                    branch 'dev1'
                 }
             }
             steps {
