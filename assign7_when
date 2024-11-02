@@ -24,11 +24,7 @@ pipeline {
         
         stage('Stage 1 - Build') {
             agent { label 'master' }
-             when {
-                expression {
-                         return env.GIT_BRANCH == 'main' || env.GIT_BRANCH == 'origin/main' || env.GIT_BRANCH == 'dev1'
-                }
-             }
+             
             steps {
                 echo "Building the project for user: ${JOB_TITLE}"
                 echo "Deployment Environment: ${ENV_NAME}"
@@ -39,7 +35,7 @@ pipeline {
             agent { label 'master' }
             steps {
                 script {
-                    if (NOTIFICATION_ENABLED) {
+                    if (NOTIFICATION_ENABLED == "true") {
                         echo "Notifications are enabled."
                     }
                     echo "Running tests for ${JOB_TITLE}"
@@ -51,7 +47,12 @@ pipeline {
 
         stage('Stage 3 - Deploy') {
             agent { label 'java' }
-
+               when {
+                expression {
+                         currentBuild.result == null || currentBuild.result == 'SUCCESS'
+                         return env.GIT_BRANCH == 'main' || env.GIT_BRANCH == 'dev1'
+                } // Only runs if the previous stages succeeded
+              }
          steps {
                 echo "Deploying ${JOB_TITLE} to ${ENV_NAME} environment."
                 echo "Using credentials with username: ${env.USER_CREDENTIALS_USR}"
@@ -60,6 +61,11 @@ pipeline {
 
         stage('Stage 4 - Notify') {
             agent { label 'java' }
+                when {
+                expression {
+                         currentBuild.result == null || currentBuild.result == 'SUCCESS'
+                } // Only runs if the previous stages succeeded
+              }
             steps {
                 echo "Sending deployment notifications for ${JOB_TITLE}."
             }
@@ -69,18 +75,16 @@ pipeline {
     post {
         success {
             emailext(
-                to: 'yaqoobali599@gmail.com',
+                body: 'Build success: ${env.BUILD_URL}',
                 subject: "${env.JOB_NAME} - Build #${env.BUILD_NUMBER} - SUCCESS",
-                body: "The build succeeded!\nJob URL: ${env.BUILD_URL}",
-                attachLog: true
+                to: 'yaqoobali599@gmail.com'
             )
         }
         failure {
             emailext(
-                to: 'yaqoobali599@gmail.com',
-                subject: "${env.JOB_NAME} - Build #${env.BUILD_NUMBER} - FAILURE",
-                body: "The build failed.\nJob URL: ${env.BUILD_URL}",
-                attachLog: true
+                body: 'Build failure: ${env.BUILD_URL}',
+                subject: "${env.JOB_NAME} - Build #${env.BUILD_NUMBER} - SUCCESS",
+                to: 'yaqoobali599@gmail.com'
             )
         }
     }
